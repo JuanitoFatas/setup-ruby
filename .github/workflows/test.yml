@@ -12,9 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-16.04, ubuntu-18.04, macos-latest, windows-latest ]
+        os: [ windows-latest ]
         # Use various version syntaxes here for testing
-        ruby: [ .ruby-version, 2.3, ruby-2.4, 2.5, ruby-2.6.5, 2.7.0, jruby, truffleruby, rubinius ]
+        ruby: [ 2.3, ruby-2.4, 2.5, ruby-2.6.5, 2.7.0 ]
         exclude:
         - os: windows-latest
           ruby: truffleruby
@@ -39,8 +39,10 @@ jobs:
       run: ruby -ropen-uri -e 'puts open(%{https://rubygems.org/}) { |f| f.read(1024) }'
     - name: C extension test
       run: gem install json:2.2.0 --no-document
-    - run: bundle --version
-    - run: bundle install
+    - run: |
+        bundle config --local path .bundle/gems
+        ruby -e 'STDERR.puts %{NOTE: warning}; STDERR.puts 42'
+        bundle install
     - run: bundle exec rake --version
 
   lint:
