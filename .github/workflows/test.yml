@@ -34,6 +34,7 @@ jobs:
     - name: Test
       run: |
         gem install bundler
+        bundle config --local path .bundle/gems
         ruby -e 'STDERR.puts %{NOTE: warning}; STDERR.puts 42'
         echo after
 
