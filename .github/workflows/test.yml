@@ -31,19 +31,12 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
     - run: ruby --version
-    - run: ridk version
-      if: matrix.os == 'windows-latest' && !startsWith(matrix.ruby, '2.3')
-    - name: OpenSSL version
-      run: ruby -ropenssl -e 'puts OpenSSL::OPENSSL_LIBRARY_VERSION'
-    - name: OpenSSL test
-      run: ruby -ropen-uri -e 'puts open(%{https://rubygems.org/}) { |f| f.read(1024) }'
-    # - name: C extension test
-    #   run: gem install json:2.2.0 --no-document
     - name: Test
       run: |
         gem install bundler
+        bundle config --local path .bundle/gems
         ruby -e 'STDERR.puts %{NOTE: warning}; STDERR.puts 42'
-    - run: bundle exec rake --version
+        echo after
 
   lint:
     runs-on: ubuntu-latest
