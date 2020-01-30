@@ -39,10 +39,12 @@ jobs:
       run: ruby -ropen-uri -e 'puts open(%{https://rubygems.org/}) { |f| f.read(1024) }'
     - name: C extension test
       run: gem install json:2.2.0 --no-document
-    - run: |
+    - name: Test
+      run: |
+        gem install bundler
         bundle config --local path .bundle/gems
         ruby -e 'STDERR.puts %{NOTE: warning}; STDERR.puts 42'
-        bundle install
+        bundle --jobs 3 --retry 3
     - run: bundle exec rake --version
 
   lint:
