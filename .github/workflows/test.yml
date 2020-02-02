@@ -12,20 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-16.04, ubuntu-18.04, macos-latest, windows-latest ]
+        os: [ ubuntu-16.04, ubuntu-18.04 ]
         # Use various version syntaxes here for testing
-        ruby: [ .ruby-version, 2.3, 2.7.0, ruby-head, jruby, truffleruby, truffleruby-head, rubinius ]
-        exclude:
-        - os: windows-latest
-          ruby: truffleruby
-        - os: windows-latest
-          ruby: truffleruby-head
-        - os: ubuntu-16.04
-          ruby: rubinius
-        - os: macos-latest
-          ruby: rubinius
-        - os: windows-latest
-          ruby: rubinius
+        ruby: [ .ruby-version ]
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
@@ -33,17 +22,18 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
     - run: ruby --version
-    - run: ridk version
-      if: matrix.os == 'windows-latest' && !startsWith(matrix.ruby, '2.3')
-    - name: OpenSSL version
-      run: ruby -ropenssl -e 'puts OpenSSL::OPENSSL_LIBRARY_VERSION'
-    - name: OpenSSL test
-      run: ruby -ropen-uri -e 'puts open(%{https://rubygems.org/}) { |f| f.read(1024) }'
-    - name: C extension test
-      run: gem install json:2.2.0 --no-document
-    - run: bundle --version
-    - run: bundle install
-    - run: bundle exec rake --version
+    - run: ruby -e "system(RbConfig.ruby, '-e', 'p(:foo)')"
+    - run: echo $PATH
+    - run: echo $HOME
+    - run: ls -la /home
+    - run: ls -la $HOME
+    - run: ls -la /
+    - run: ls -la /opt
+    - run: ls -la /opt/hostedtoolcache
+    - run: ls -la /opt/hostedtoolcache/Ruby
+    - run: ls -la /opt/hostedtoolcache/Ruby/2.5.7
+    - run: ls -la /opt/hostedtoolcache/Ruby/2.5.7/x64
+    - run: ls -la /opt/hostedtoolcache/Ruby/2.5.7/x64/bin
 
   lint:
     runs-on: ubuntu-latest
