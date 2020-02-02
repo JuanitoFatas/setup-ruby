@@ -12,9 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-16.04, ubuntu-18.04, macos-latest, windows-latest ]
+        os: [ ubuntu-16.04, ubuntu-18.04 ] #, macos-latest, windows-latest ]
         # Use various version syntaxes here for testing
-        ruby: [ .ruby-version, 2.3, 2.7.0, ruby-head, jruby, truffleruby, truffleruby-head, rubinius ]
+        ruby: [ .ruby-version, 2.3, 2.7.0, ruby-head ] #, jruby, truffleruby, truffleruby-head, rubinius ]
         exclude:
         - os: windows-latest
           ruby: truffleruby
@@ -32,7 +32,15 @@ jobs:
     - uses: ./
       with:
         ruby-version: ${{ matrix.ruby }}
+        fix-home-permissions: true
     - run: ruby --version
+    - run: ruby -e "system(RbConfig.ruby, '-e', 'p(:foo)')"
+    - run: echo $PATH
+    - run: ls -la /usr/share
+    - run: ls -la /usr/share/rust
+    - run: ls -la /usr/share/rust/.cargo
+    - run: ls -la /usr/share/rust/.cargo/bin
+
     - run: ridk version
       if: matrix.os == 'windows-latest' && !startsWith(matrix.ruby, '2.3')
     - name: OpenSSL version

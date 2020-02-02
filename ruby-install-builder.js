@@ -1,3 +1,4 @@
+const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const core = require('@actions/core')
@@ -15,6 +16,16 @@ export function getAvailableVersions(platform, engine) {
 
 export async function install(platform, ruby) {
   const rubyPrefix = await downloadAndExtract(platform, ruby)
+
+  if (platform.startsWith('ubuntu-') &&
+      ruby.startsWith('ruby-') &&
+      core.getInput('fix-home-permissions') === 'true') {
+    // Fix "Insecure world writable dir" warnings on Ubuntu with MRI
+    const mode = fs.statSync(os.homedir()).mode
+    console.log(mode)
+    console.log(mode & ~fs.constants.S_IWOTH)
+    fs.chmodSync(os.homedir(), mode & ~fs.constants.S_IWOTH)
+  }
 
   core.addPath(path.join(rubyPrefix, 'bin'))
   if (ruby.startsWith('rubinius')) {

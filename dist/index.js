@@ -4864,6 +4864,7 @@ function escape(s) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getAvailableVersions", function() { return getAvailableVersions; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "install", function() { return install; });
+const fs = __webpack_require__(747)
 const os = __webpack_require__(87)
 const path = __webpack_require__(622)
 const core = __webpack_require__(470)
@@ -4881,6 +4882,16 @@ function getAvailableVersions(platform, engine) {
 
 async function install(platform, ruby) {
   const rubyPrefix = await downloadAndExtract(platform, ruby)
+
+  if (platform.startsWith('ubuntu-') &&
+      ruby.startsWith('ruby-') &&
+      core.getInput('fix-home-permissions') === 'true') {
+    // Fix "Insecure world writable dir" warnings on Ubuntu with MRI
+    const mode = fs.statSync(os.homedir()).mode
+    console.log(mode)
+    console.log(mode & ~fs.constants.S_IWOTH)
+    fs.chmodSync(os.homedir(), mode & ~fs.constants.S_IWOTH)
+  }
 
   core.addPath(path.join(rubyPrefix, 'bin'))
   if (ruby.startsWith('rubinius')) {
